@@ -1,0 +1,21 @@
+name: json_to_ui
+description: A lightweight dynamic UI builder with basic caching
+version: 1.0.0
+homepage: https://github.com/yourusername/dynamic_ui_builder
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  cached_network_image: ^3.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
