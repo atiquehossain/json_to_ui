@@ -42,17 +42,13 @@ class JsonNetworkUiBuilder extends StatelessWidget {
           case Method.post:
             response = await networkService.post(request.body ?? {});
             break;
-        /* case Method.put:
+          case Method.put:
             response = await networkService.put(request.body ?? {});
-            print("PUT response: $response");
             break;
           case Method.delete:
             response = await networkService.delete();
-            print("DELETE response: $response");
-            break;*/
-          default:
-            throw Exception('Unsupported HTTP method: ${request.method}');
-        }
+            break;
+          }
 
         if (isSaveOnHive) {
           await hiveService.saveData(request.url, response);

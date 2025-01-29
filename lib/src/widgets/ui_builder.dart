@@ -1,102 +1,104 @@
 import 'package:flutter/material.dart';
 
-import '../../json_to_ui.dart';
-
 class UIBuilder {
   static Widget parseJson(Map<String, dynamic> json) {
-    return _buildWidget(json);
-  }
-
-  static Widget _buildWidget(Map<String, dynamic> config) {
-    switch (config['type']) {
-      case 'Scaffold':
-        return Scaffold(
-          backgroundColor: _parseColor(config['backgroundColor']),
-          appBar: _buildAppBar(config['appBar']),
-          body: _buildBody(config['body']),
-        );
-      case 'Container':
-        return Container(
-          decoration: _buildBoxDecoration(config['decoration']),
-          padding: _buildEdgeInsets(config['padding']),
-          margin: _buildEdgeInsets(config['margin']),
-          child: _buildChild(config['child']),
-        );
-      case 'Column':
-        return Column(
-          mainAxisAlignment: _getMainAxisAlignment(config['mainAxisAlignment']),
-          crossAxisAlignment: _getCrossAxisAlignment(config['crossAxisAlignment']),
-          children: _buildChildren(config['children']),
-        );
-      case 'Row':
-        return Row(
-          mainAxisAlignment: _getMainAxisAlignment(config['mainAxisAlignment']),
-          crossAxisAlignment: _getCrossAxisAlignment(config['crossAxisAlignment']),
-          children: _buildChildren(config['children']),
-        );
-      case 'Text':
-        return Text(
-          config['text'] ?? '',
-          style: _buildTextStyle(config['style']),
-        );
-      case 'Image':
-        return CachedImage(
-          imageUrl: config['url'],
-          radius: config['radius']?.toDouble(),
-        );
-      default:
-        return const SizedBox.shrink();
+    if (json.containsKey('type')) {
+      switch (json['type']) {
+        case 'Scaffold':
+          return Scaffold(
+            backgroundColor: _parseColor(json['backgroundColor']),
+            appBar: json.containsKey('appBar') ? _buildAppBar(json['appBar']) : null,
+            body: json.containsKey('body') ? _buildBody(json['body']) : const Center(child: Text('No body content')),
+          );
+        default:
+          return const SizedBox.shrink();
+      }
     }
+    return const SizedBox.shrink();
   }
 
 
-  static AppBar? _buildAppBar(Map<String, dynamic>? config) {
-    if (config == null) return null;
+
+  static AppBar _buildAppBar(Map<String, dynamic> appBarData) {
     return AppBar(
-      title: Text(config['title'] ?? ''),
-      backgroundColor: _parseColor(config['backgroundColor']),
+      backgroundColor: _parseColor(appBarData['backgroundColor']),
+      title: Text(
+        appBarData['title']['text'] ?? 'Default Title',
+        style: _buildTextStyle(appBarData['title']['style']),
+      ),
     );
   }
 
-  static Widget _buildBody(dynamic bodyConfig) {
-    if (bodyConfig is List) {
-      return Column(children: _buildChildren(bodyConfig));
+  static Widget _buildBody(Map<String, dynamic> bodyData) {
+    if (bodyData['type'] == 'Column' || bodyData['type'] == 'Row') {
+      return _buildFlexLayout(bodyData);
+    } else if (bodyData['type'] == 'Center') {
+      final child = bodyData['child'];
+      if (child != null) {
+        return Center(child: _buildChildWidget(child));
+      }
+    } else if (bodyData['type'] == 'Container') {
+      return _buildContainer(bodyData);
+    } else if (bodyData['type'] == 'Padding') {
+      return Padding(
+        padding: _buildEdgeInsets(bodyData['padding']),
+        child: _buildChildWidget(bodyData['child']),
+      );
     }
-    return _buildWidget(bodyConfig);
+    return const SizedBox.shrink();
   }
 
-  static List<Widget> _buildChildren(List<dynamic>? children) {
-    return children?.map<Widget>((child) => _buildWidget(child)).toList() ?? [];
-  }
-
-  static Widget _buildChild(dynamic childConfig) {
-    return childConfig != null ? _buildWidget(childConfig) : const SizedBox.shrink();
-  }
-
-  static Color? _parseColor(String? colorString) {
-    if (colorString == null) return null;
-    return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-  }
-
-  static TextStyle? _buildTextStyle(Map<String, dynamic>? styleData) {
-    if (styleData == null) return null;
-    return TextStyle(
-      color: _parseColor(styleData['color']),
-      fontSize: styleData['fontSize']?.toDouble(),
-      fontWeight: _parseFontWeight(styleData['fontWeight']),
-      fontStyle: styleData['fontStyle'] == 'italic' ? FontStyle.italic : null,
+  static Widget _buildContainer(Map<String, dynamic> containerData) {
+    return Container(
+      padding: _buildEdgeInsets(containerData['padding']),
+      margin: _buildEdgeInsets(containerData['margin']),
+      decoration: _buildBoxDecoration(containerData['decoration']),
+      child: _buildChildWidget(containerData['child']),
     );
   }
 
-  static FontWeight? _parseFontWeight(String? fontWeight) {
-    switch (fontWeight) {
-      case 'bold':
-        return FontWeight.bold;
-      case 'w500':
-        return FontWeight.w500;
-      default:
-        return null;
+  static BoxDecoration? _buildBoxDecoration(Map<String, dynamic>? decorationData) {
+    if (decorationData == null) return null;
+    return BoxDecoration(
+      color: _parseColor(decorationData['color']),
+      borderRadius: _buildBorderRadius(decorationData['borderRadius']),
+      border: _buildBorder(decorationData['border']),
+    );
+  }
+
+  static BorderRadius? _buildBorderRadius(Map<String, dynamic>? borderRadiusData) {
+    if (borderRadiusData == null) return null;
+    return BorderRadius.circular(borderRadiusData['radius']?.toDouble() ?? 0);
+  }
+
+  static Border? _buildBorder(Map<String, dynamic>? borderData) {
+    if (borderData == null) return null;
+    return Border.all(
+      color: _parseColor(borderData['color']) ?? Colors.black,
+      width: borderData['width']?.toDouble() ?? 1.0,
+    );
+  }
+
+  static Widget _buildFlexLayout(Map<String, dynamic> flexData) {
+    List<Widget> childrenWidgets = [];
+    if (flexData.containsKey('children')) {
+      final children = flexData['children'];
+      for (var child in children) {
+        childrenWidgets.add(_buildChildWidget(child));
+      }
     }
+
+    return flexData['type'] == 'Column'
+        ? Column(
+      crossAxisAlignment: _getCrossAxisAlignment(flexData),
+      mainAxisAlignment: _getMainAxisAlignment(flexData),
+      children: childrenWidgets,
+    )
+        : Row(
+      crossAxisAlignment: _getCrossAxisAlignment(flexData),
+      mainAxisAlignment: _getMainAxisAlignment(flexData),
+      children: childrenWidgets,
+    );
   }
 
   static CrossAxisAlignment _getCrossAxisAlignment(Map<String, dynamic> flexData) {
@@ -135,6 +137,47 @@ class UIBuilder {
     }
   }
 
+  static Widget _buildChildWidget(Map<String, dynamic> childData) {
+    switch (childData['type']) {
+      case 'Text':
+        return Text(
+          childData['text'] ?? 'Default Text',
+          style: _buildTextStyle(childData['style']),
+        );
+      case 'Padding':
+        return Padding(
+          padding: _buildEdgeInsets(childData['padding']),
+          child: _buildChildWidget(childData['child']),
+        );
+      case 'CircleAvatar':
+        return CircleAvatar(
+          backgroundImage: childData['backgroundImage'] != null &&
+              childData['backgroundImage']['type'] == 'NetworkImage'
+              ? NetworkImage(childData['backgroundImage']['url'])
+              : null,
+          radius: childData['radius']?.toDouble(),
+        );
+      case 'Column':
+      case 'Row':
+        return _buildFlexLayout(childData);
+      case 'SizedBox':
+        return SizedBox(
+          height: childData['height']?.toDouble(),
+          width: childData['width']?.toDouble(),
+        );
+      case 'ElevatedButton':
+        return ElevatedButton(
+          onPressed: childData['onPressed'] != null
+              ? () => debugPrint(childData['onPressed'][0])
+              : null,
+          style: _buildButtonStyle(childData['style']),
+          child: _buildChildWidget(childData['child']),
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
   static EdgeInsets _buildEdgeInsets(Map<String, dynamic>? paddingData) {
     if (paddingData == null) return EdgeInsets.zero;
     return EdgeInsets.only(
@@ -145,28 +188,49 @@ class UIBuilder {
     );
   }
 
-
-
-  static BoxDecoration? _buildBoxDecoration(Map<String, dynamic>? decorationData) {
-    if (decorationData == null) return null;
-    return BoxDecoration(
-      color: _parseColor(decorationData['color']),
-      borderRadius: _buildBorderRadius(decorationData['borderRadius']),
-      border: _buildBorder(decorationData['border']),
+  static ButtonStyle? _buildButtonStyle(Map<String, dynamic>? styleData) {
+    if (styleData == null) return null;
+    return ElevatedButton.styleFrom(
+      backgroundColor: _parseColor(styleData['backgroundColor']),
+      padding: styleData['padding'] != null
+          ? EdgeInsets.symmetric(
+        vertical: styleData['padding']['vertical']?.toDouble() ?? 0,
+        horizontal: styleData['padding']['horizontal']?.toDouble() ?? 0,
+      )
+          : null,
+      shape: styleData['shape'] != null &&
+          styleData['shape']['type'] == 'RoundedRectangleBorder'
+          ? RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+            styleData['shape']['borderRadius']?.toDouble() ?? 0),
+      )
+          : null,
     );
   }
 
-  static BorderRadius? _buildBorderRadius(Map<String, dynamic>? borderRadiusData) {
-    if (borderRadiusData == null) return null;
-    return BorderRadius.circular(borderRadiusData['radius']?.toDouble() ?? 0);
+  static Color? _parseColor(String? colorString) {
+    if (colorString == null) return null;
+    return Color(int.parse(colorString.replaceFirst('#', '0xff')));
   }
 
-  static Border? _buildBorder(Map<String, dynamic>? borderData) {
-    if (borderData == null) return null;
-    return Border.all(
-      color: _parseColor(borderData['color']) ?? Colors.black,
-      width: borderData['width']?.toDouble() ?? 1.0,
+  static TextStyle? _buildTextStyle(Map<String, dynamic>? styleData) {
+    if (styleData == null) return null;
+    return TextStyle(
+      color: _parseColor(styleData['color']),
+      fontSize: styleData['fontSize']?.toDouble(),
+      fontWeight: _parseFontWeight(styleData['fontWeight']),
+      fontStyle: styleData['fontStyle'] == 'italic' ? FontStyle.italic : null,
     );
   }
 
+  static FontWeight? _parseFontWeight(String? fontWeight) {
+    switch (fontWeight) {
+      case 'bold':
+        return FontWeight.bold;
+      case 'w500':
+        return FontWeight.w500;
+      default:
+        return null;
+    }
+  }
 }
