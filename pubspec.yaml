@@ -1,6 +1,6 @@
 name: json_to_ui
 description: "A Flutter package that converts JSON data into dynamic UI components, enabling developers to build UIs from network data effortlessly."
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/atiquehossain/json_to_ui
 
 environment:
