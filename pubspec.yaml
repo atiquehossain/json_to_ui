@@ -1,5 +1,5 @@
 name: json_to_ui
-description: A lightweight dynamic UI builder with basic caching
+description: "A Flutter package that converts JSON data into dynamic UI components, enabling developers to build UIs from network data effortlessly."
 version: 1.0.1
 homepage: https://github.com/atiquehossain/json_to_ui
 
@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0
-  hive: ^2.2.3
   hive_flutter: ^1.1.0
 
 dev_dependencies:

@@ -4,6 +4,24 @@
 
 # Changelog
 
+## [1.0.2] - 2025-01-29
+
+### Added
+- **NetworkService**: Implemented methods for handling network requests, including support for both GET and POST requests.
+- **Hive Integration**: Added functionality to save and fetch network data from local Hive storage for offline use.
+- **Internet Connectivity Check**: Introduced `hasInternetConnection()` to check for an active internet connection before making network requests.
+- **Dynamic UI Fetching**: Added functionality to fetch dynamic UI configurations from a remote server or load them from local Hive storage when offline.
+
+### Fixed
+- Fixed an issue where network requests would not fallback to cached data when offline.
+
+### Changed
+- Improved error handling for network failures and added more informative error messages.
+- Enhanced the `fetchJson()` method to better handle network status and cache data.
+
+
+
+
 ## 1.0.1
 - 📌 Issue fixed
 
