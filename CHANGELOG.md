@@ -1,6 +1,11 @@
+
+
 ## 0.0.1
 
 # Changelog
+
+## 1.0.1
+- 📌 Issue fixed
 
 ## 1.0.0 - Initial Release
 - 🎉 First stable version of `json_to_ui`.

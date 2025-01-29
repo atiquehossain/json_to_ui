@@ -42,12 +42,7 @@ class JsonNetworkUiBuilder extends StatelessWidget {
           case Method.post:
             response = await networkService.post(request.body ?? {});
             break;
-          case Method.put:
-            response = await networkService.put(request.body ?? {});
-            break;
-          case Method.delete:
-            response = await networkService.delete();
-            break;
+
           }
 
         if (isSaveOnHive) {

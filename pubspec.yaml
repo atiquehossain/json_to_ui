@@ -1,7 +1,7 @@
 name: json_to_ui
 description: A lightweight dynamic UI builder with basic caching
-version: 1.0.0
-homepage: https://github.com/yourusername/dynamic_ui_builder
+version: 1.0.1
+homepage: https://github.com/atiquehossain/json_to_ui
 
 environment:
   sdk: ^3.6.0

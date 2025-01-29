@@ -1,4 +1,4 @@
-enum Method { get, post, put, delete }
+enum Method { get, post }
 
 class NetworkRequest {
   final String url;
