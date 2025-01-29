@@ -1,5 +1,12 @@
 ## 0.0.1
 
+# Changelog
+
+## 1.0.0 - Initial Release
+- 🎉 First stable version of `json_to_ui`.
+- 📌 Supports dynamic UI generation from JSON.
+- 🚀 Includes network requests, storage handling, and widget rendering.
+
 
 ### Initial Setup:
 - Created a Flutter application to dynamically build UI from JSON data.
