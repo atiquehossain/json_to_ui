@@ -3,6 +3,9 @@
 ## 0.0.1
 
 # Changelog
+## [1.0.3] - 2025-02-01
+- Implemented `UIBuilder` to parse JSON into Flutter widgets such as `Switch`, `Checkbox`, `TextField`, `Image`,`SingleChildScrollView`, and `ListView`.
+
 
 ## [1.0.2] - 2025-01-29
 

@@ -105,8 +105,7 @@ class UIBuilder {
           );
   }
 
-  static CrossAxisAlignment _getCrossAxisAlignment(
-      Map<String, dynamic> flexData) {
+  static CrossAxisAlignment _getCrossAxisAlignment(Map<String, dynamic> flexData) {
     switch (flexData['crossAxisAlignment']) {
       case 'start':
         return CrossAxisAlignment.start;
@@ -123,8 +122,7 @@ class UIBuilder {
     }
   }
 
-  static MainAxisAlignment _getMainAxisAlignment(
-      Map<String, dynamic> flexData) {
+  static MainAxisAlignment _getMainAxisAlignment(Map<String, dynamic> flexData) {
     switch (flexData['mainAxisAlignment']) {
       case 'start':
         return MainAxisAlignment.start;
@@ -171,6 +169,28 @@ class UIBuilder {
           height: childData['height']?.toDouble(),
           width: childData['width']?.toDouble(),
         );
+      case 'Switch':
+        return Switch(
+          value: childData['value'] ?? false,
+          onChanged: (bool newValue) {},
+        );
+      case 'Checkbox':
+        return Checkbox(
+          value: childData['value'] ?? false,
+          onChanged: (bool? newValue) {},
+        );
+      case 'TextField':
+        return TextField(
+          decoration: InputDecoration(
+            hintText: childData['hintText'],
+          ),
+        );
+      case 'Image':
+        return Image.network(childData['url']);
+      case 'ListView':
+        return _buildListView(childData['child']);/**//**/
+      case 'SingleChildScrollView':
+        return SingleChildScrollView(child: _buildChildWidget(childData['child']));
       case 'ElevatedButton':
         return ElevatedButton(
           onPressed: childData['onPressed'] != null
@@ -238,5 +258,19 @@ class UIBuilder {
       default:
         return null;
     }
+  }
+
+  static Widget _buildListView(Map<String, dynamic> listViewData) {
+    List<Widget> childrenWidgets = [];
+    if (listViewData.containsKey('children')) {
+      final children = listViewData['children'];
+      for (var child in children) {
+        childrenWidgets.add(_buildChildWidget(child));
+      }
+    }
+
+    return ListView(
+      children: childrenWidgets,
+    );
   }
 }
